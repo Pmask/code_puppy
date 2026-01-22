@@ -55,10 +55,10 @@ class TestDBOSConfiguration:
         assert result is False
 
     @pytest.mark.parametrize("truthy_value", ["1", "true", "True", "yes", "on"])
-    def test_get_use_dbos_returns_true_for_truthy_values(
+    def test_get_use_dbos_returns_false_forced(
         self, mock_config_paths, truthy_value
     ):
-        """Test that various truthy values enable DBOS."""
+        """Test that various truthy values STILL return False for DBOS (Forced Disabled)."""
         mock_cfg_dir, mock_cfg_file, _ = mock_config_paths
 
         os.makedirs(mock_cfg_dir, exist_ok=True)
@@ -68,7 +68,7 @@ class TestDBOSConfiguration:
             config.write(f)
 
         result = cp_config.get_use_dbos()
-        assert result is True, f"Failed for value: {truthy_value}"
+        assert result is False, f"Failed: expected False for forced disable with input: {truthy_value}"
 
     @pytest.mark.parametrize("falsy_value", ["0", "false", "no", "off", ""])
     def test_get_use_dbos_returns_false_for_falsy_values(

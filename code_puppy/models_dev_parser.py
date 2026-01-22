@@ -113,10 +113,9 @@ class ModelInfo:
 
 
 class ModelsDevRegistry:
-    """Registry for managing models and providers from models.dev API.
+    """Registry for managing models and providers from bundled models.dev data.
 
-    Fetches data from the live models.dev API first, falling back to a bundled
-    JSON file if the API is unavailable.
+    Fetches data from the bundled JSON file.
     """
 
     def __init__(self, json_path: str | Path | None = None) -> None:
@@ -147,27 +146,8 @@ class ModelsDevRegistry:
         Returns:
             Parsed JSON data if successful, None otherwise.
         """
-        try:
-            with httpx.Client(timeout=10.0) as client:
-                response = client.get(MODELS_DEV_API_URL)
-                response.raise_for_status()
-                data = response.json()
-                if isinstance(data, dict) and len(data) > 0:
-                    return data
-                return None
-        except httpx.TimeoutException:
-            emit_warning("models.dev API timed out, using bundled fallback")
-            return None
-        except httpx.HTTPStatusError as e:
-            emit_warning(
-                f"models.dev API returned {e.response.status_code}, using bundled fallback"
-            )
-            return None
-        except Exception as e:
-            emit_warning(
-                f"Failed to fetch from models.dev API: {e}, using bundled fallback"
-            )
-            return None
+        # Disabled for security/privacy - no external API calls
+        return None
 
     def _get_bundled_json_path(self) -> Path:
         """Get the path to the bundled JSON file."""
@@ -189,29 +169,23 @@ class ModelsDevRegistry:
                 emit_error(f"Invalid JSON in {self.json_path}: {e}")
                 raise
         else:
-            # Try live API first
-            data = self._fetch_from_api()
-            if data:
-                self.data_source = "live:models.dev"
-                emit_info("📡 Fetched latest models from models.dev")
-            else:
-                # Fall back to bundled JSON
-                bundled_path = self._get_bundled_json_path()
-                if bundled_path.exists():
-                    try:
-                        with open(bundled_path, "r", encoding="utf-8") as f:
-                            data = json.load(f)
-                        self.data_source = f"bundled:{bundled_path.name}"
-                        emit_info(
-                            "📦 Using bundled models database (models.dev unavailable)"
-                        )
-                    except json.JSONDecodeError as e:
-                        emit_error(f"Invalid JSON in bundled file {bundled_path}: {e}")
-                        raise
-                else:
-                    raise FileNotFoundError(
-                        f"No data source available: models.dev API failed and bundled file not found at {bundled_path}"
+            # Use bundled JSON only
+            bundled_path = self._get_bundled_json_path()
+            if bundled_path.exists():
+                try:
+                    with open(bundled_path, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                    self.data_source = f"bundled:{bundled_path.name}"
+                    emit_info(
+                        "📦 Using bundled models database"
                     )
+                except json.JSONDecodeError as e:
+                    emit_error(f"Invalid JSON in bundled file {bundled_path}: {e}")
+                    raise
+            else:
+                raise FileNotFoundError(
+                    f"No data source available: bundled file not found at {bundled_path}"
+                )
 
         if not isinstance(data, dict):
             raise ValueError("Top-level JSON must be an object")

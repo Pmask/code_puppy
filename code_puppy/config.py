@@ -69,10 +69,7 @@ DBOS_DATABASE_URL = os.environ.get(
 
 def get_use_dbos() -> bool:
     """Return True if DBOS should be used based on 'enable_dbos' (default False)."""
-    cfg_val = get_value("enable_dbos")
-    if cfg_val is None:
-        return False
-    return str(cfg_val).strip().lower() in {"1", "true", "yes", "on"}
+    return False # Forced disabled for security/privacy
 
 
 def get_subagent_verbose() -> bool:

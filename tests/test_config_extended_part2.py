@@ -116,15 +116,15 @@ class TestConfigExtendedPart2:
             mock_get.return_value = None
             result = get_use_dbos()
             assert result is False
-            mock_get.assert_called_once_with("enable_dbos")
+            # Check is removed as function is stubbed to always return False
 
-        # Test various true values
+        # Test various true values - SHOULD NOW RETURN FALSE (Forced Disabled)
         true_values = ["1", "true", "yes", "on", "TRUE", "Yes"]
         for val in true_values:
             with patch("code_puppy.config.get_value") as mock_get:
                 mock_get.return_value = val
                 result = get_use_dbos()
-                assert result is True
+                assert result is False # Was True, now False
 
         # Test various false values
         false_values = ["0", "false", "no", "off", "", "random"]
