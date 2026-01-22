@@ -294,11 +294,11 @@ class TestModelsDevRegistryAPIFetching:
     """Tests for API fetching and data loading."""
 
     @patch("code_puppy.models_dev_parser.httpx.Client")
-    def test_fetch_from_api_success(
+    def test_fetch_from_api_disabled(
         self,
         mock_client_class,
     ):
-        """Test successful API fetch."""
+        """Test API fetch is disabled."""
         mock_client = MagicMock()
         mock_client_class.return_value.__enter__.return_value = mock_client
 
@@ -320,10 +320,9 @@ class TestModelsDevRegistryAPIFetching:
         response.json.return_value = api_data
         mock_client.get.return_value = response
 
+        # Should fall back to bundled because API fetch is hard-disabled
         registry = ModelsDevRegistry()
-        assert registry.data_source == "live:models.dev"
-        assert len(registry.providers) == 1
-        assert "anthropic" in registry.providers
+        assert registry.data_source.startswith("bundled:")
 
     @patch("code_puppy.models_dev_parser.httpx.Client")
     def test_fetch_from_api_timeout(

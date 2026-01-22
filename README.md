@@ -41,15 +41,13 @@
 
 ## Overview
 
-*This project was coded angrily in reaction to Windsurf and Cursor removing access to models and raising prices.*
-
 *You could also run 50 code puppies at once if you were insane enough.*
 
 *Would you rather plow a field with one ox or 1024 puppies?*
     - If you pick the ox, better slam that back button in your browser.
 
 
-Code Puppy is an AI-powered code generation agent, designed to understand programming tasks, generate high-quality code, and explain its reasoning similar to tools like Windsurf and Cursor.
+Code Puppy is an AI-powered code generation agent, designed to understand programming tasks, generate high-quality code, and explain its reasoning.
 
 
 ## Quick start
