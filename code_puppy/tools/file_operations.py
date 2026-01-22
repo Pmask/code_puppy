@@ -633,6 +633,9 @@ def _grep(context: RunContext, search_string: str, directory: str = ".") -> Grep
         with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".ignore") as f:
             ignore_file = f.name
             for pattern in DIR_IGNORE_PATTERNS:
+                # Skip patterns that would match the search directory itself
+                if would_match_directory(pattern, directory):
+                    continue
                 f.write(f"{pattern}\n")
 
         cmd.extend(["--ignore-file", ignore_file])
